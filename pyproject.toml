@@ -1,24 +1,37 @@
 [project]
 name = "ascend"
 version = "0.1.0"
-description = "Add your description here"
+description = "Ascend — соц-RPG платформа саморазвития (backend)"
 readme = "README.md"
 requires-python = ">=3.14.6"
 dependencies = [
+    "alembic>=1.18.5",
+    "argon2-cffi>=25.1.0",
+    "asyncpg>=0.31.0",
+    "fastapi[standard]>=0.139.0",
+    "prometheus-client>=0.25.0",
     "pydantic>=2.13.4",
+    "pydantic-settings>=2.14.2",
+    "sqlalchemy>=2.0.51",
+    "uvicorn[standard]>=0.51.0",
 ]
 
 [dependency-groups]
 dev = [
+    "httpx>=0.28.1",
     "mypy>=2.2.0",
+    "pytest>=9.1.1",
+    "pytest-asyncio>=1.4.0",
     "ruff>=0.15.21",
-    "sqlalchemy[mypy]>=2.0.51",
 ]
 
 [tool.ruff]
 target-version = "py314"
 line-length = 88
-src = ["backend"]
+src = ["."]
+
+[tool.ruff.lint.isort]
+known-first-party = ["backend"]
 
 [tool.ruff.lint]
 select = [
@@ -35,7 +48,23 @@ ignore = []
 quote-style = "double"
 indent-style = "space"
 
+[tool.ruff.lint.flake8-bugbear]
+# FastAPI-паттерн: Depends/Query/... в дефолтах аргументов — это не баг.
+extend-immutable-calls = [
+    "fastapi.Depends",
+    "fastapi.Query",
+    "fastapi.Path",
+    "fastapi.Body",
+    "fastapi.Header",
+    "fastapi.Cookie",
+]
+
 [tool.mypy]
 python_version = "3.14"
 strict = true
-plugins = ["pydantic.mypy", "sqlalchemy.ext.mypy.plugin"]
+plugins = ["pydantic.mypy"]
+exclude = ["backend/migrations/"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["backend/tests"]
