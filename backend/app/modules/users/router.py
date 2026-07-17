@@ -15,3 +15,14 @@ async def create_user(
 ) -> UserRead:
     user = await service.create_user(session, data)
     return UserRead.model_validate(user)
+
+
+# router.py — отдельный эндпоинт, доступный ТОЛЬКО админу
+@router.patch("/{user_id}/role", response_model=UserRead)
+async def set_user_role(
+    user_id: int,
+    data: UserRoleUpdate,
+    session: AsyncSession = Depends(get_session),
+    current_user: User = Depends(require_admin),  # проверка прав
+):
+    ...

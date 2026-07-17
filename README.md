@@ -38,7 +38,9 @@ uv sync --dev
 cp .env.example .env   # и подставить значения
 
 # 3. Инфраструктура (Postgres/Redis/Redpanda)
-docker compose -f deploy/docker-compose.yml up -d
+# ВАЖНО: compose-файл лежит в deploy/, а .env — в корне, поэтому нужен --env-file,
+# иначе ${POSTGRES_*} будут пустыми и контейнер postgres не стартует.
+docker compose --env-file .env -f deploy/docker-compose.yml up -d
 
 # 4. Миграции
 uv run alembic revision --autogenerate -m "init"
