@@ -53,3 +53,8 @@ class Habit(IntPkMixin, TimestampMixin, Base):
     best_streak: Mapped[int] = mapped_column(default=0)
     last_checkin_at: Mapped[datetime | None] = mapped_column(default=None)
     is_active: Mapped[bool] = mapped_column(default=True)
+
+
+class HabitCheckin(IntPkMixin, TimestampMixin, Base):
+    __tablename__ = "habit_checkins"
+
