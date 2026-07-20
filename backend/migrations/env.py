@@ -10,6 +10,7 @@ from backend.app.core.db import Base
 
 # Импортируем модели, чтобы они зарегистрировались в Base.metadata.
 from backend.app.modules.users import models  # noqa: F401
+from backend.app.modules.habits import models  # noqa: F401
 
 config = context.config
 

@@ -1,7 +1,7 @@
 import enum
-from datetime import time, datetime
+from datetime import date, datetime
 
-from sqlalchemy import String, ForeignKey, func, Enum
+from sqlalchemy import String, ForeignKey, Enum, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from backend.app.core.db import Base
@@ -35,6 +35,11 @@ class TargetType(str, enum.Enum):
     numeric = "numeric"
 
 
+class SourceType(str, enum.Enum):
+    manual = "manual"
+    webhook = "webhook"
+
+
 class Habit(IntPkMixin, TimestampMixin, Base):
     __tablename__ = "habits"
 
@@ -58,3 +63,17 @@ class Habit(IntPkMixin, TimestampMixin, Base):
 class HabitCheckin(IntPkMixin, TimestampMixin, Base):
     __tablename__ = "habit_checkins"
 
+    __table_args__ = (
+        UniqueConstraint("habit_id", "checkin_date", name="uq_habit_checkin_per_day"),
+    )
+
+    habit_id: Mapped[int] = mapped_column(
+        ForeignKey("habits.id", ondelete="CASCADE"), nullable=False
+    )
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    value: Mapped[float] = mapped_column(nullable=False)
+    checkin_date: Mapped[date] = mapped_column(nullable=False)
+    source: Mapped[SourceType] = mapped_column(Enum(SourceType), default=SourceType.manual)
+    idempotency_key: Mapped[str | None] = mapped_column(default=None)
